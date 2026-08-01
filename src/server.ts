@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+dotenv.config();
 import app from './app';
 import connectDataBase from "./config/database";
 
