@@ -1,6 +1,9 @@
 import bcrypt from 'bcryptjs';
 import userRepository from '../repositories/user.repository';
 import { UserRole, IUser } from '../models/user.model';
+import { HTTP_STATUS } from '../constants/httpStatus';
+import ApiError from '../utils/ApiError';
+import { generateAccessToken, generateRefreshToken } from '../utils/tokens';
 
 
 export interface registerUserDto {
@@ -29,7 +32,7 @@ class AuthService {
         // check if password match
 
         if (password !== confirmPassword) {
-            throw new Error("password do not match")
+            throw new ApiError(HTTP_STATUS.BAD_REQUEST, "password do not match")
         }
 
         // check wether user already exist
@@ -37,7 +40,7 @@ class AuthService {
         const userExist = await userRepository.findUserByEmail(email);
 
         if (userExist) {
-            throw new Error("Email already exists");
+            throw new ApiError(HTTP_STATUS.CONFLICT, "Email already exists");
         }
 
 
@@ -68,6 +71,47 @@ class AuthService {
             updatedAt: user.updatedAt
         }
 
+    }
+
+    async login(email: string, password: string) {
+
+        const user = await userRepository.findUserByEmail(email);
+
+        if (!user) {
+            console.log("test")
+            throw new ApiError(HTTP_STATUS.UNAUTHORIZED, "Invalid User or Password")
+        }
+
+        if (!user.isActive) {
+            throw new ApiError(HTTP_STATUS.FORBIDDEN, "User account is not Active")
+        }
+
+        const isPasswordValid = await bcrypt.compare(
+            password,
+            user.password
+        );
+
+        if (!isPasswordValid) {
+            console.log("test")
+            throw new ApiError(HTTP_STATUS.UNAUTHORIZED, "Invalid User or Password");
+        }
+
+        const accessToken = generateAccessToken(user._id.toString(), user.role);
+
+        const refreshToken = generateRefreshToken(user._id.toString())
+
+        return {
+            user:{
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            dateOfBirth: user.dateOfBirth,
+            role: user.role,
+            isActive: user.isActive
+        },
+        accessToken,
+        refreshToken
+    }
     }
 }
 

@@ -1,7 +1,8 @@
 import { Router } from "express";
 import authController from "../controllers/auth.controller";
-import { registerValidation } from "../validations/auth.validation"
+import { loginValidation, registerValidation } from "../validations/auth.validation"
 import validate from "../middleware/validator";
+import authenticate from "../middleware/auth.middleware";
 
 
 const router = Router()
@@ -11,5 +12,9 @@ const router = Router()
  */
 
 router.post('/register', registerValidation, validate, authController.RegisterController);
+
+router.post('/login', loginValidation, validate, authController.loginController)
+
+router.get('/profile', authenticate, authController.profile)
 
 export default router;

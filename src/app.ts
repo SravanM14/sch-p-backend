@@ -5,6 +5,8 @@ import compression from "compression";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import routes from './routes';
+import notFound from "./middleware/notFound";
+import errorHandler from "./middleware/errorHandler";
 
 const app:Application = express();
 
@@ -26,5 +28,10 @@ app.get('/', (req, res)=>{
  */
 
 app.use('/api/v1', routes)
+
+
+app.use(notFound);
+
+app.use(errorHandler)
 
 export default app;

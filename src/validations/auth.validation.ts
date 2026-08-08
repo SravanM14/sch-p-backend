@@ -56,3 +56,17 @@ export const registerValidation = [
         .withMessage("Invalid user role"),
 ]
 
+export const loginValidation =[
+
+    body("email")
+    .trim()
+    .notEmpty()
+    .withMessage("Email is Required")
+    .isEmail()
+    .withMessage("Email is Invalid")
+    .normalizeEmail(),
+
+    body("password")
+    .notEmpty()
+    .withMessage("Password is Required")
+]
