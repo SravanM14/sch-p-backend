@@ -6,6 +6,12 @@ interface AccessTokenPayload {
     role: string;
 }
 
+interface RefreshTokenPayload{
+    id:string;
+    iat?:string;
+    role:string;
+}
+
 export const generateAccessToken = (id: string, role: string): string => {
 
     return jwt.sign({
@@ -20,4 +26,12 @@ export const generateAccessToken = (id: string, role: string): string => {
 
 export const generateRefreshToken = (id: string): string => {
     return jwt.sign({ id }, process.env.REFRESH_TOKEN_SECRET as string, { expiresIn: '7d' })
+}
+
+
+export const verifyRefreshToken = (token:string):RefreshTokenPayload=>{
+return jwt.verify(
+    token,
+    process.env.REFRESH_TOKEN_SECRET as string
+) as RefreshTokenPayload
 }

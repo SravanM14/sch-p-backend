@@ -16,10 +16,11 @@ interface JwtPayload {
 
     try{
          const authHeader = req.headers.authorization;
-
+         console.log("AUTH HEADER: starts");
          if(!authHeader){
             throw new ApiError(HTTP_STATUS.UNAUTHORIZED, "Authorization header is required");
          }
+          console.log("AUTH HEADER:", authHeader);
 
          if(!authHeader.startsWith("Bearer ")){
             throw new ApiError(HTTP_STATUS.UNAUTHORIZED, "Invalid authorization format");

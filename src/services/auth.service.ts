@@ -3,7 +3,7 @@ import userRepository from '../repositories/user.repository';
 import { UserRole, IUser } from '../models/user.model';
 import { HTTP_STATUS } from '../constants/httpStatus';
 import ApiError from '../utils/ApiError';
-import { generateAccessToken, generateRefreshToken } from '../utils/tokens';
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/tokens';
 
 
 export interface registerUserDto {
@@ -101,17 +101,55 @@ class AuthService {
         const refreshToken = generateRefreshToken(user._id.toString())
 
         return {
-            user:{
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            dateOfBirth: user.dateOfBirth,
-            role: user.role,
-            isActive: user.isActive
-        },
-        accessToken,
-        refreshToken
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                dateOfBirth: user.dateOfBirth,
+                role: user.role,
+                isActive: user.isActive
+            },
+            accessToken,
+            refreshToken
+        }
     }
+
+
+    async refreshAcessToken(refreshToken: string) {
+        try {
+     const decoded = verifyRefreshToken(refreshToken);
+    console.log("REFRESH TOKEN VERIFIED:", decoded);
+            const user = await userRepository.findUserById(decoded.id);
+
+
+            if (!user) {
+                throw new ApiError(HTTP_STATUS.UNAUTHORIZED, "user not found")
+            }
+
+            if (!user.isActive) {
+                throw new ApiError(
+                    HTTP_STATUS.FORBIDDEN,
+                    "Your account is inactive"
+                );
+            }
+          const accessToken = generateAccessToken(
+            user._id.toString(),
+            user.role
+          )
+
+          return {accessToken};
+
+        } catch (err) {
+
+           if(err instanceof ApiError){
+            throw err;
+           }
+
+           throw new ApiError(HTTP_STATUS.UNAUTHORIZED,
+             "Invalid or expired refresh token"
+            )
+        }
+
     }
 }
 
