@@ -188,7 +188,7 @@ class AuthService {
             await user.save();
 
             const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`
-
+console.log("BEFORE SEND EMAIL");
             // Send email
             await transport.sendMail({
                 from: process.env.EMAIL_USER,
@@ -239,9 +239,10 @@ class AuthService {
         `
             });
 
+console.log("AFTER SEND EMAIL");
         }
         catch (err) {
-
+          console.log(err)
         }
     }
 
