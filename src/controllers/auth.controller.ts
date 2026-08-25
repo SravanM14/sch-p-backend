@@ -96,6 +96,107 @@ class AuthController {
             next(err)
         }
     }
+
+    async forgotPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const { email } = req.body;
+
+            if (!email) {
+                throw new ApiError(HTTP_STATUS.BAD_REQUEST, "Email Required")
+            }
+
+            await authService.forgotPassword(email);
+
+            res.status(HTTP_STATUS.OK).json(
+                new ApiResponse(true, " If an account exists with this email, a password reset link has been sent.")
+            )
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    async resetPassword(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const token = req.params.token;
+            const { password, confirmPassword } = req.body;
+
+            if (!token) {
+                throw new ApiError(
+                    HTTP_STATUS.BAD_REQUEST,
+                    "Reset token is required"
+                );
+            }
+
+            if (typeof token !== "string") {
+                throw new ApiError(
+                    HTTP_STATUS.BAD_REQUEST,
+                    "Invalid reset token"
+                );
+            }
+
+            if (!password || !confirmPassword) {
+                throw new ApiError(
+                    HTTP_STATUS.BAD_REQUEST,
+                    "Password and confirm password are required"
+                );
+            }
+
+            if (password !== confirmPassword) {
+                throw new ApiError(
+                    HTTP_STATUS.BAD_REQUEST,
+                    "Passwords do not match"
+                );
+            }
+
+            await authService.resetPassword(
+                token,
+                password
+            );
+
+            res.status(HTTP_STATUS.OK).json(
+                new ApiResponse(
+                    true,
+                    "Password reset successfully"
+                )
+            );
+
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async logout(
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
+    try {
+        const { refreshToken } = req.body;
+
+        if (!refreshToken) {
+            throw new ApiError(
+                HTTP_STATUS.BAD_REQUEST,
+                "Refresh token is required"
+            );
+        }
+
+        await authService.logout(refreshToken);
+
+        res.status(HTTP_STATUS.OK).json(
+            new ApiResponse(
+                true,
+                "Logout successful"
+            )
+        );
+
+    } catch (error) {
+        next(error);
+    }
+}
 }
 
 export default new AuthController();

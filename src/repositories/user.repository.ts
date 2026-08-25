@@ -48,6 +48,16 @@ class UserRepository {
     async deleteUser(id: string): Promise<IUser | null> {
         return await User.findByIdAndDelete(id);
     }
+
+    async findUserByResetToken(token: string) {
+    return User.findOne({
+        resetPasswordToken: token,
+        resetPasswordExpires: {
+            $gt: new Date()
+        }
+    });
+}
+
 }
 
 export default new UserRepository();
