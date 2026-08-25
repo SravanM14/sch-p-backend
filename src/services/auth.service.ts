@@ -187,8 +187,13 @@ class AuthService {
 
             await user.save();
 
-            const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`
-console.log("BEFORE SEND EMAIL");
+            const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+            console.log("EMAIL USER EXISTS:", !!process.env.EMAIL_USER);
+            console.log(
+                "EMAIL PASSWORD EXISTS:",
+                !!process.env.EMAIL_PASSWORD
+            );
+            console.log("BEFORE SEND EMAIL");
             // Send email
             await transport.sendMail({
                 from: process.env.EMAIL_USER,
@@ -239,10 +244,10 @@ console.log("BEFORE SEND EMAIL");
         `
             });
 
-console.log("AFTER SEND EMAIL");
+            console.log("AFTER SEND EMAIL");
         }
         catch (err) {
-          console.log(err)
+            console.log(err)
         }
     }
 
@@ -290,26 +295,26 @@ console.log("AFTER SEND EMAIL");
     }
 
     async logout(refreshToken: string) {
-    const decoded = verifyRefreshToken(refreshToken);
+        const decoded = verifyRefreshToken(refreshToken);
 
-    const user = await userRepository.findUserById(
-        decoded.id
-    );
-
-    if (!user) {
-        throw new ApiError(
-            HTTP_STATUS.UNAUTHORIZED,
-            "User not found"
+        const user = await userRepository.findUserById(
+            decoded.id
         );
+
+        if (!user) {
+            throw new ApiError(
+                HTTP_STATUS.UNAUTHORIZED,
+                "User not found"
+            );
+        }
+
+        // Invalidate refresh token
+        user.refreshToken = null;
+
+        await user.save();
+
+        return true;
     }
-
-    // Invalidate refresh token
-    user.refreshToken = null;
-
-    await user.save();
-
-    return true;
-}
 }
 
 export default new AuthService();
