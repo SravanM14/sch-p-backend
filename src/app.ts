@@ -9,10 +9,14 @@ import notFound from "./middleware/notFound";
 import errorHandler from "./middleware/errorHandler";
 
 const app:Application = express();
-
+app.use(cors(
+    {
+    origin:"*"
+  }
+))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors())
+
 app.use(compression())
 app.use(morgan("dev"))
 app.use(helmet())
