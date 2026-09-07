@@ -248,6 +248,7 @@ class AuthService {
         }
         catch (err) {
             console.log(err)
+             throw err;
         }
     }
 
