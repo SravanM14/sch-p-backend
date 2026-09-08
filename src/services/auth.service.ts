@@ -167,15 +167,12 @@ class AuthService {
 
 
     async forgotPassword(email: string) {
-         console.log("🔥 SERVICE START");
         try {
             const user = await userRepository.findUserByEmail(email);
-       console.log("👤 USER EXISTS:", !!user);
             if (!user) {
                    console.log("⚠️ USER NOT FOUND");
                 return;
             }
- console.log("🔐 GENERATING RESET TOKEN");
             const { resetToken, hashedToken } = generateResetToken();
 
             // Token Expiry in 30 mins
@@ -186,16 +183,9 @@ class AuthService {
 
             user.resetPasswordToken = hashedToken;
             user.resetPasswordExpires = resetExpiryToken;
-       console.log("💾 SAVING RESET TOKEN");
             await user.save();
 
             const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
-            console.log("EMAIL USER EXISTS:", !!process.env.EMAIL_USER);
-            console.log(
-                "EMAIL PASSWORD EXISTS:",
-                !!process.env.EMAIL_PASSWORD
-            );
-            console.log("BEFORE SEND EMAIL");
             // Send email
             await transport.sendMail({
                 from: process.env.EMAIL_USER,
@@ -245,8 +235,6 @@ class AuthService {
             </p>
         `
             });
-
-            console.log("AFTER SEND EMAIL");
         }
         catch (err) {
             console.log(err)
