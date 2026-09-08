@@ -6,6 +6,7 @@ import ApiError from '../utils/ApiError';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/tokens';
 import { generateResetToken, hashResetToken } from '../utils/reset-token';
 import transport from '../config/email.config';
+import { bytes } from 'node:stream/consumers';
 
 
 export interface registerUserDto {
@@ -170,7 +171,7 @@ class AuthService {
         try {
             const user = await userRepository.findUserByEmail(email);
             if (!user) {
-                   console.log("⚠️ USER NOT FOUND");
+                console.log("⚠️ USER NOT FOUND");
                 return;
             }
             const { resetToken, hashedToken } = generateResetToken();
@@ -238,7 +239,7 @@ class AuthService {
         }
         catch (err) {
             console.log(err)
-             throw err;
+            throw err;
         }
     }
 
@@ -306,6 +307,148 @@ class AuthService {
 
         return true;
     }
+
+    async changePassword(userId: string, currentPassword: string, newPassword: string, confirmPassword: string) {
+
+        const user = await userRepository.findUserById(userId);
+
+        if (!user) {
+            console.log("User not found");
+            throw new ApiError(HTTP_STATUS.NOT_FOUND, "User not Found");
+        }
+
+        const currentPasswordCheck = await bcrypt.compare(currentPassword, user.password);
+
+        if (!currentPasswordCheck) {
+            console.log("Current password is not matched with username");
+            throw new ApiError(HTTP_STATUS.UNAUTHORIZED, "Current password is not matched with username")
+        }
+
+        if (newPassword !== confirmPassword) {
+            throw new ApiError(
+                HTTP_STATUS.BAD_REQUEST,
+                "New password and confirm password do not match"
+            );
+        }
+
+        // 4. Make sure new password is different
+        if (currentPassword === newPassword) {
+            throw new ApiError(
+                HTTP_STATUS.BAD_REQUEST,
+                "New password must be different from current password"
+            );
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        user.password = hashedPassword;
+        user.refreshToken = null;
+
+        await user.save();
+
+        return true;
+
+    }
+
+
+    async getProfileDetails(userId: string) {
+
+        const user = await userRepository.findUserById(userId);
+
+        if (!user) {
+            throw new ApiError(HTTP_STATUS.NOT_FOUND, "User Not Found")
+        }
+
+        return {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            dateOfBirth: user.dateOfBirth,
+            role: user.role,
+            isActive: user.isActive,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt
+        }
+    }
+
+    async getAllUsersList() {
+        const usersList = await userRepository.findAll();
+
+        return usersList.map((user) => ({
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            dateOfBirth: user.dateOfBirth,
+            role: user.role,
+            isActive: user.isActive,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+        }));
+    }
+
+    async getUserById(userId: string) {
+        const user = await userRepository.findUserById(userId);
+
+        if (!user) {
+            throw new ApiError(
+                HTTP_STATUS.NOT_FOUND,
+                "User not found"
+            );
+        }
+
+        return {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            dateOfBirth: user.dateOfBirth,
+            role: user.role,
+            isActive: user.isActive,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+        };
+    }
+
+    async updateUserById(userId: string, updateData: Partial<IUser>) {
+        const user = await userRepository.findUserById(userId);
+
+        if (!user) {
+            throw new ApiError(
+                HTTP_STATUS.NOT_FOUND,
+                "User not found"
+            );
+        }
+
+        Object.assign(user, updateData);
+        await user.save();
+
+        return {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            dateOfBirth: user.dateOfBirth,
+            role: user.role,
+            isActive: user.isActive,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+        };
+    }
+
+    async deleteUserById(userId: string) {
+            const user = await userRepository.findUserById(userId);
+
+            if (!user) {
+                throw new ApiError(
+                    HTTP_STATUS.NOT_FOUND,
+                    "User not found"
+                );
+            }
+
+            await userRepository.deleteUser(userId);
+
+            return {
+                message: "User deleted successfully"
+            };
+        }
 }
 
 export default new AuthService();

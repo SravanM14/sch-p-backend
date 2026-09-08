@@ -16,11 +16,9 @@ interface JwtPayload {
 
     try{
          const authHeader = req.headers.authorization;
-         console.log("AUTH HEADER: starts");
          if(!authHeader){
             throw new ApiError(HTTP_STATUS.UNAUTHORIZED, "Authorization header is required");
          }
-          console.log("AUTH HEADER:", authHeader);
 
          if(!authHeader.startsWith("Bearer ")){
             throw new ApiError(HTTP_STATUS.UNAUTHORIZED, "Invalid authorization format");
@@ -33,6 +31,8 @@ interface JwtPayload {
          const decode = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
 
          req.user = decode;
+
+         console.log(req.user,"user")
 
          next();
     }catch(err){

@@ -1,10 +1,10 @@
 class ApiResponse<T>{
-    sucess:boolean;
+    success:boolean;
     message:string;
     data:T | null;
 
-    constructor(sucess:boolean, message:string, data:T | null=null){
-        this.sucess = sucess;
+    constructor(success:boolean, message:string, data:T | null=null){
+        this.success = success;
         this.message= message;
         this.data= data;
     }
