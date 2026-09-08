@@ -98,19 +98,25 @@ class AuthController {
     }
 
     async forgotPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+          console.log("🔥 FORGOT PASSWORD CONTROLLER START");
+         console.log("BODY:", req.body)
         try {
             const { email } = req.body;
+             console.log("📧 EMAIL:", email);
 
             if (!email) {
                 throw new ApiError(HTTP_STATUS.BAD_REQUEST, "Email Required")
             }
 
             await authService.forgotPassword(email);
+              console.log("✅ FORGOT PASSWORD SERVICE COMPLETED");
 
             res.status(HTTP_STATUS.OK).json(
                 new ApiResponse(true, " If an account exists with this email, a password reset link has been sent.")
             )
+               console.log("🚀 RESPONSE SENT");
         } catch (err) {
+              console.log("❌ FORGOT PASSWORD CONTROLLER ERROR:", err);
             next(err);
         }
     }
