@@ -367,7 +367,10 @@ class AuthService {
             role: user.role,
             isActive: user.isActive,
             createdAt: user.createdAt,
-            updatedAt: user.updatedAt
+            updatedAt: user.updatedAt,
+            phoneNumber: user.phoneNumber,
+            gender: user.gender,
+            profileImage: user.profileImage
         }
     }
 

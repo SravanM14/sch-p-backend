@@ -17,6 +17,8 @@ router.post('/register', registerValidation, validate, authController.RegisterCo
 
 router.post('/login', loginValidation, validate, authController.loginController)
 
+router.post('/logout', authenticate, authController.logout)
+
 router.get('/profile', authenticate, authController.profile)
 
 router.get('/admin-profile',authenticate, authorize("ADMIN", "TEACHER") ,authController.adminProfile)

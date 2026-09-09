@@ -7,7 +7,11 @@ export enum UserRole {
     TEACHER = "TEACHER",
     PARENT = "PARENT"
 }
-
+export enum Gender {
+    MALE = "Male",
+    FEMALE = "Female",
+    OTHER = "Other"
+}
 
 export interface IUser extends Document {
     name: string;
@@ -21,6 +25,9 @@ export interface IUser extends Document {
     refreshToken: string | null;
     createdAt: Date;
     updatedAt: Date;
+    phoneNumber?: string;
+    gender?: Gender;
+    profileImage?: string;
 
 }
 
@@ -73,6 +80,19 @@ const userSchema = new Schema<IUser>(
             type: String,
             default: null
         },
+        phoneNumber: {
+            type: String,
+            default: null
+        },
+        gender: {
+            type: String,
+            enum: Object.values(Gender),
+            default: null   
+    },
+        profileImage: {
+            type: String,
+            default: null
+        }
     },
     {
         timestamps: true
