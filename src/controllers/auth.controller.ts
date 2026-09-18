@@ -78,6 +78,28 @@ class AuthController {
         }
     }
 
+    async updateProfile(
+        req: Request,
+        res: Response,  
+        next: NextFunction){
+            const userId = req.user?.id;
+            if (!userId) {
+                throw new ApiError(
+                    HTTP_STATUS.UNAUTHORIZED,
+                    "Authentication required"
+                );
+            }
+
+            try {
+                const updatedUser = await authService.updateProfileDetails(userId, req.body);
+                res.status(HTTP_STATUS.OK).json(
+                    new ApiResponse(true, "Profile updated successfully", updatedUser)
+                );
+            } catch (error) {
+                next(error);
+            }
+        }
+
 
     async adminProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {

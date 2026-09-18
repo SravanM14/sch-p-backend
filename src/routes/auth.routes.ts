@@ -21,11 +21,13 @@ router.post('/logout', authenticate, authController.logout)
 
 router.get('/profile', authenticate, authController.profile)
 
+router.put('/profile-update', authenticate, authController.updateProfile)
+
 router.get('/admin-profile',authenticate, authorize("ADMIN", "TEACHER") ,authController.adminProfile)
 
 router.get('/users',authenticate, authorize("ADMIN") ,authController.getAllUsers)
 
-router.get("/users/:id", authenticate, authorize("ADMIN"), authController.getUserById);
+router.get("/users/:id", authenticate, authController.getUserById);
 
 router.put("/users/:id", authenticate, authorize("ADMIN"), authController.updateUserById);
 

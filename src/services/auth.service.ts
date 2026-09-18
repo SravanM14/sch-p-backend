@@ -411,6 +411,38 @@ class AuthService {
         };
     }
 
+   async updateProfileDetails(userId: string, updateData: Partial<IUser>) {
+        const user = await userRepository.findUserById(userId); 
+        if (!user) {
+            throw new ApiError(
+                HTTP_STATUS.NOT_FOUND,
+                "User not found"
+            );
+        }
+  
+       
+        Object.assign(user, updateData);
+
+        await user.validate();
+        await user.save();  
+
+        return {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            dateOfBirth: user.dateOfBirth,
+            role: user.role,
+            isActive: user.isActive,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+            phoneNumber: user.phoneNumber,
+            gender: user.gender,
+            profileImage: user.profileImage
+
+        };
+    }
+
+
     async updateUserById(userId: string, updateData: Partial<IUser>) {
         const user = await userRepository.findUserById(userId);
 
