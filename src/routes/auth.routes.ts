@@ -5,6 +5,7 @@ import validate from "../middleware/validator";
 import authenticate from "../middleware/auth.middleware";
 import authService from "../services/auth.service";
 import authorize from "../middleware/autorize.middleware";
+import upload from "../config/multer.config";
 
 
 const router = Router()
@@ -21,7 +22,10 @@ router.post('/logout', authenticate, authController.logout)
 
 router.get('/profile', authenticate, authController.profile)
 
-router.put('/profile-update', authenticate, authController.updateProfile)
+router.put('/profile-update',
+    authenticate,
+    upload.single("profileImage"), authController.updateProfile
+   )
 
 router.get('/admin-profile',authenticate, authorize("ADMIN", "TEACHER") ,authController.adminProfile)
 

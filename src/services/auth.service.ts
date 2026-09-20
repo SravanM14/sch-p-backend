@@ -408,6 +408,9 @@ class AuthService {
             isActive: user.isActive,
             createdAt: user.createdAt,
             updatedAt: user.updatedAt,
+            phoneNumber: user.phoneNumber,
+            gender: user.gender,
+            profileImage: user.profileImage
         };
     }
 

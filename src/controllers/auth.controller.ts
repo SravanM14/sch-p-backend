@@ -4,6 +4,8 @@ import { HTTP_STATUS } from "../constants/httpStatus";
 import ApiResponse from "../utils/ApiResponse";
 import ApiError from "../utils/ApiError";
 import { validateAtLeastOneField, validateRequiredFields } from "../utils/validation";
+import cloudinary from "../config/cloudinary.config";
+import { uploadToCloudinary } from "../utils/uploadToCloudinary";
 
 
 class AuthController {
@@ -80,8 +82,10 @@ class AuthController {
 
     async updateProfile(
         req: Request,
-        res: Response,  
-        next: NextFunction){
+        res: Response,
+        next: NextFunction) {
+        try {
+
             const userId = req.user?.id;
             if (!userId) {
                 throw new ApiError(
@@ -90,15 +94,33 @@ class AuthController {
                 );
             }
 
-            try {
-                const updatedUser = await authService.updateProfileDetails(userId, req.body);
-                res.status(HTTP_STATUS.OK).json(
-                    new ApiResponse(true, "Profile updated successfully", updatedUser)
+            let profileImage: string | undefined;
+
+            if (req.file) {
+                console.log("Uploading image to Cloudinary...");
+
+                const result = await uploadToCloudinary(req.file.buffer, "school-management/profile-images")
+
+                profileImage = result.secure_url;
+                console.log(
+                    "Cloudinary Image URL:",
+                    profileImage
                 );
-            } catch (error) {
-                next(error);
             }
+             
+            const updateUser ={
+                ...req.body,
+                ...(profileImage && {profileImage})
+            }
+
+            const updatedUser = await authService.updateProfileDetails(userId, updateUser);
+            res.status(HTTP_STATUS.OK).json(
+                new ApiResponse(true, "Profile updated successfully", updatedUser)
+            );
+        } catch (error) {
+            next(error);
         }
+    }
 
 
     async adminProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -219,7 +241,7 @@ class AuthController {
             ]);
             const { refreshToken } = req.body;
 
-       
+
 
             await authService.logout(refreshToken);
 
