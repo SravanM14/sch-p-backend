@@ -14,6 +14,7 @@ export enum Gender {
 }
 
 export interface IUser extends Document {
+    userId: string;
     name: string;
     email: string;
     password: string;
@@ -92,7 +93,13 @@ const userSchema = new Schema<IUser>(
         profileImage: {
             type: String,
             default: null
-        }
+        },
+        userId: {
+            type: String,
+            unique: true,
+            required: true,
+            trim: true,
+},
     },
     {
         timestamps: true

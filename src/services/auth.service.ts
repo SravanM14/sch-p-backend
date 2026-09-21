@@ -7,6 +7,7 @@ import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '.
 import { generateResetToken, hashResetToken } from '../utils/reset-token';
 import transport from '../config/email.config';
 import { bytes } from 'node:stream/consumers';
+import { generateUserId } from '../utils/generateUserId';
 
 
 export interface registerUserDto {
@@ -46,14 +47,18 @@ class AuthService {
             throw new ApiError(HTTP_STATUS.CONFLICT, "Email already exists");
         }
 
+        if (!role) {
+            throw new ApiError(HTTP_STATUS.BAD_REQUEST, "Role is required");
+        }
 
         // hash password
 
         const hashPassword = await bcrypt.hash(password, 10)
-
+        const userId = await generateUserId(role);
 
         // save User
         const user = await userRepository.create({
+            userId,
             name,
             email,
             password: hashPassword,
@@ -66,6 +71,7 @@ class AuthService {
 
         return {
             _id: user._id,
+            userId:user.userId,
             name: user.name,
             email: user.email,
             dateOfBirth: user.dateOfBirth,
@@ -111,6 +117,7 @@ class AuthService {
             user: {
                 _id: user._id,
                 name: user.name,
+                userId:user.userId,
                 email: user.email,
                 dateOfBirth: user.dateOfBirth,
                 role: user.role,
@@ -361,6 +368,7 @@ class AuthService {
 
         return {
             id: user._id,
+            userId:user.userId,
             name: user.name,
             email: user.email,
             dateOfBirth: user.dateOfBirth,
@@ -379,6 +387,7 @@ class AuthService {
 
         return usersList.map((user) => ({
             id: user._id,
+            userId:user.userId,
             name: user.name,
             email: user.email,
             dateOfBirth: user.dateOfBirth,
@@ -401,6 +410,7 @@ class AuthService {
 
         return {
             id: user._id,
+            userId:user.userId,
             name: user.name,
             email: user.email,
             dateOfBirth: user.dateOfBirth,
@@ -431,6 +441,7 @@ class AuthService {
 
         return {
             id: user._id,
+            userId:user.userId,
             name: user.name,
             email: user.email,
             dateOfBirth: user.dateOfBirth,
@@ -462,6 +473,7 @@ class AuthService {
         return {
             id: user._id,
             name: user.name,
+            userId:user.userId,
             email: user.email,
             dateOfBirth: user.dateOfBirth,
             role: user.role,
