@@ -29,7 +29,7 @@ router.put('/profile-update',
 
 router.get('/admin-profile',authenticate, authorize("ADMIN", "TEACHER") ,authController.adminProfile)
 
-router.get('/users',authenticate, authorize("ADMIN") ,authController.getAllUsers)
+router.get('/userList',authenticate, authorize("ADMIN") ,authController.getUsers)
 
 router.get("/users/:id", authenticate, authController.getUserById);
 

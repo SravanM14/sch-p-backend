@@ -6,6 +6,7 @@ import ApiError from "../utils/ApiError";
 import { validateAtLeastOneField, validateRequiredFields } from "../utils/validation";
 import cloudinary from "../config/cloudinary.config";
 import { uploadToCloudinary } from "../utils/uploadToCloudinary";
+import { UserRole } from "../models/user.model";
 
 
 class AuthController {
@@ -301,6 +302,39 @@ class AuthController {
         }
     }
 
+
+    async getUsers(
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
+    try {
+        const { search, role, isActive , page, limit} = req.query;
+
+        const currentPage = page ? Number(page) : 1;
+        const currentLimit = limit ? Number(limit): 10;
+
+        const users = await authService.getUsers(
+            search as string | undefined,
+            role as UserRole | undefined,
+            isActive !== undefined
+                ? isActive === "true"
+                : undefined,
+            currentPage,
+            currentLimit
+        );
+
+        res.status(HTTP_STATUS.OK).json(
+            new ApiResponse(
+                true,
+                "Users fetched successfully",
+                users
+            )
+        );
+    } catch (error) {
+        next(error);
+    }
+}
     async getUserById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const id = req.params.id as string;

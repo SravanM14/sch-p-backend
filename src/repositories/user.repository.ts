@@ -1,4 +1,4 @@
-import User, { IUser } from '../models/user.model';
+import User, { IUser, UserRole } from '../models/user.model';
 
 class UserRepository {
     /**
@@ -31,6 +31,61 @@ class UserRepository {
     async findAll(): Promise<IUser[]> {
         return await User.find()
     }
+
+
+    async findUsers(search?: string, role?: UserRole, isActive?: boolean,
+        page:number =1, limit:number =10
+    ): Promise<{
+        users:IUser[],
+        totalUsers:number
+    }>{
+      const filter:Record<string, unknown> = {}
+
+      if(search){
+        filter.$or=[
+            {
+                userId:{
+                    $regex:search,
+                    $options:"i",
+                },
+            },
+            {
+                email:{
+                    $regex:search,
+                    $options:"i",
+                }
+            },
+            {
+                name:{
+                     $regex:search,
+                    $options:"i",
+                }
+            }
+        ]
+      }
+
+      if(role){
+        filter.role = role;
+      }
+
+      if(isActive !== undefined){
+        filter.isActive = isActive;
+      }
+
+      const skip = (page -1 )* limit;
+
+      const [users, totalUsers] = await Promise.all([
+        User.find(filter)
+             .skip(skip)
+             .limit(limit),
+
+             User.countDocuments(filter)
+      ])
+      return{
+        users, totalUsers
+      }
+   }
+
 
     /**
   * update user by id

@@ -398,6 +398,14 @@ class AuthService {
         }));
     }
 
+
+    async getUsers(
+        search?:string, role?:UserRole, isActive?:boolean , page:number =1, limit:number=10
+    ):Promise<{ users: IUser[]; totalUsers: number }>{
+       
+        return await userRepository.findUsers(search, role, isActive,page, limit);
+    }
+
     async getUserById(userId: string) {
         const user = await userRepository.findUserById(userId);
 
