@@ -5,11 +5,11 @@ const ROLE_PREFIX: Record<UserRole, string> = {
     [UserRole.ADMIN]: "ADM",
     [UserRole.TEACHER]: "TEA",
     [UserRole.PARENT]: "PAR",
-    [UserRole.STUDENT]: "STU",
+    [UserRole.STUDENT]: "STUD",
 };
 
 
-export const generateUserId = async (
+export const generateId = async (
     role:UserRole
 ):Promise<string>=>{
 
@@ -44,7 +44,7 @@ export const generateUserId = async (
 
     const sequenceNumber = counter.sequence
         .toString()
-        .padStart(3, "0");
+        .padStart(4, "0");
 
         return `${prefix}${sequenceNumber}`
 

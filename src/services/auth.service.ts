@@ -7,7 +7,8 @@ import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '.
 import { generateResetToken, hashResetToken } from '../utils/reset-token';
 import transport from '../config/email.config';
 import { bytes } from 'node:stream/consumers';
-import { generateUserId } from '../utils/generateUserId';
+import { generateId } from '../utils/generateUserId';
+
 
 
 export interface registerUserDto {
@@ -54,7 +55,7 @@ class AuthService {
         // hash password
 
         const hashPassword = await bcrypt.hash(password, 10)
-        const userId = await generateUserId(role);
+        const userId = await generateId(role);
 
         // save User
         const user = await userRepository.create({

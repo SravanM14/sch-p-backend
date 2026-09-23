@@ -98,15 +98,8 @@ class AuthController {
             let profileImage: string | undefined;
 
             if (req.file) {
-                console.log("Uploading image to Cloudinary...");
-
                 const result = await uploadToCloudinary(req.file.buffer, "school-management/profile-images")
-
                 profileImage = result.secure_url;
-                console.log(
-                    "Cloudinary Image URL:",
-                    profileImage
-                );
             }
              
             const updateUser ={

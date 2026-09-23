@@ -24,6 +24,10 @@ class UserRepository {
         return await User.findById(id)
     }
 
+
+    async findUserByUserId(userId: string): Promise<IUser | null> {
+    return await User.findOne({ userId });
+}
     /**
    * Get All Users
    */
