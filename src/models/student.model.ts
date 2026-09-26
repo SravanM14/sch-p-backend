@@ -65,7 +65,16 @@ const StundentSchema = new Schema<IStudent>(
             trim: true,
             default: null,
         },
-
+         class:{
+            type:String,
+            trim:true,
+            required:true
+         },
+           section:{
+            type:String,
+            trim:true,
+            required:true
+         },
         address: {
             type: String,
             trim: true,

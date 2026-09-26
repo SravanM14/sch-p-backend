@@ -59,7 +59,7 @@ import Student, {IStudent} from "../models/student.model"
         ]
       }
       if(className){
-        filters.className = className;
+        filters.class = className;
       }
       if(section){
         filters.section = section;
@@ -68,6 +68,7 @@ import Student, {IStudent} from "../models/student.model"
         filters.isActive = isActive;
       }
 
+      console.log(filters)
       const skip =(page-1)* limit;
 
       const [students, totalStudents] = await Promise.all([
@@ -76,7 +77,7 @@ import Student, {IStudent} from "../models/student.model"
         .skip(skip)
         .limit(limit)
         .sort({createdAt:-1}),
-        Student.countDocuments()
+        Student.countDocuments(filters)
       ])
 
       return{

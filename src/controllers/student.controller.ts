@@ -14,12 +14,12 @@ class StudentController{
                 name: req.body.name,
                 dateOfBirth: new Date(req.body.dateOfBirth),
                 gender: req.body.gender,
-                class: req.body.class,
-                section: req.body.section,
                 admissionNumber: req.body.admissionNumber,
                 rollNumber: req.body.rollNumber,
                 address: req.body.address,
                 phone: req.body.phone,
+                class: req.body.class,
+                section: req.body.section,
                 parentUserId: req.body.parentUserId,
             } as Partial<IStudent> & { parentUserId: string };
              console.log(studentData,"controller")
@@ -37,14 +37,23 @@ class StudentController{
 
   async studentList(req:Request, res:Response, next:NextFunction){
     try{
-      const{search, class:className, section,isActive, page, limit}= req.query;
+      const{search, className, section,isActive, page, limit}= req.query;
 
       const currentPage = page? Number(page): 1;
       const currentLimit = limit? Number(limit):10;
+        let activeFilter: boolean | undefined;
+
+        if (isActive === "true") {
+            activeFilter = true;
+        } else if (isActive === "false") {
+            activeFilter = false;
+        } else {
+            activeFilter = undefined;
+        }
       const response = await studentService.getStudents(search as string | undefined,
-         className as string|undefined,
+        className as string|undefined,
         section  as string|undefined, 
-        isActive !== undefined ? isActive == "true" : undefined,
+        activeFilter,
         currentPage,
         currentLimit
         )
